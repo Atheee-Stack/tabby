@@ -8,8 +8,9 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "webpack-cli build",
-        "args": ["node-env=production"]
+       "commands": ["bun build ./src/main.ts --target node --outdir ../../dist/apps/api-gateway"],
+        "cwd": "apps/api-gateway",
+        "outputs": ["../../dist/apps/api-gateway"]
       },
       "configurations": {
         "development": {
@@ -18,12 +19,12 @@
       }
     },
     "serve": {
-      "executor": "@nx/js:node",
+      "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "api-gateway:build",
-        "runBuildTargetDependencies": false
+        "commands": ["bun --hot run /apps/api-gateway/src/main.js"],
+        "readyWhen": "Server is running"
       },
       "configurations": {
         "development": {

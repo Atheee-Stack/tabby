@@ -1,0 +1,24 @@
+# apps/api-gateway/bunfig.toml
+[build]
+target = "node"                     # 关键！声明 Node.js 环境
+entryPoints = ["./src/main.ts"]     # 主入口文件
+outdir = "../../dist/apps/api-gateway"  # 对齐 Nx 输出路径
+external = [                        # 排除不需要打包的依赖
+  "@nestjs/microservices",
+  "ioredis",
+  "nats",
+  "amqplib",
+  "mqtt",
+  "kafkajs",
+  "@grpc/grpc-js"
+]
+minify = true                       # 生产环境压缩
+sourcemap = "external"              # 生成独立 .map 文件
+
+[install]
+module = "commonjs"                 # NestJS 需要 CJS 格式
+prefer = "latest"                   # 优先安装最新版本
+
+[dev]
+port = 3000                         # 开发服务器端口
+hot = true                          # 启用热更新

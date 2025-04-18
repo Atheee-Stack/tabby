@@ -14,7 +14,13 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "types": ["bun-types", "node"],
+
+    "paths": {
+      "@api-gateway/*": ["libs/*/src"],
+      "@nestjs/platform-express": ["node_modules/@nestjs/platform-express"],
+      "@nestjs/platform-socket.io": ["node_modules/@nestjs/platform-socket.io"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

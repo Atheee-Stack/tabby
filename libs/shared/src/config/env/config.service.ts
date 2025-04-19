@@ -2,7 +2,11 @@
 import { Injectable } from '@nestjs/common';
 import { AppConfig, MikroORMConfig } from '../core.config.js';
 import { config } from './schemas/config.schema.js'; // Zod生成的配置对象
-import { MongoAuthMechanism, MongoReadPreference, MongoWriteConcern } from '../../enums/mongo.enum.js';
+import {
+  MongoAuthMechanism,
+  MongoReadPreference,
+  MongoWriteConcern,
+} from '../../enums/mongo.enum.js';
 import * as fs from 'fs';
 
 @Injectable()
@@ -27,8 +31,8 @@ export class ConfigService {
       this.validateEnvironmentRules,
       this.validateCredentials,
       this.validateMongoURL,
-      this.validateCertificates
-    ].forEach(validator => validator.call(this));
+      this.validateCertificates,
+    ].forEach((validator) => validator.call(this));
   }
 
   private validateConfig(): AppConfig {
@@ -44,15 +48,19 @@ export class ConfigService {
           mechanism: config.MONGO_AUTH_MECHANISM as MongoAuthMechanism,
         },
         tls: config.MONGO_TLS_ENABLED,
-        tlsCAFile: config.MONGO_TLS_CA_FILE, 
+        tlsCAFile: config.MONGO_TLS_CA_FILE,
         pool: {
           min: config.MONGO_POOL_MIN,
           max: config.MONGO_POOL_MAX,
           idleTimeoutMillis: config.MONGO_IDLE_TIMEOUT_MS,
         },
         readPreference: config.MONGO_READ_PREFERENCE as MongoReadPreference,
-        writeConcern: config.MONGO_WRITE_CONCERN as MongoWriteConcern
-    }
+        writeConcern: config.MONGO_WRITE_CONCERN as MongoWriteConcern,
+        connectionTimeout: config.MONGO_CONN_TIMEOUT,
+        socketTimeout: config.MONGO_SOCKET_TIMEOUT,
+        maxRetries: config.MONGO_MAX_RETRIES,
+        retryDelay: config.MONGO_RETRY_DELAY,
+      },
     };
   }
 
@@ -90,13 +98,17 @@ export class ConfigService {
     }
 
     // 4. 读写策略验证
-    if (this.isProduction && 
-        this.appConfig.mikroORM.readPreference === MongoReadPreference.PRIMARY) {
+    if (
+      this.isProduction &&
+      this.appConfig.mikroORM.readPreference === MongoReadPreference.PRIMARY
+    ) {
       errors.push('Avoid using primary read preference in production');
     }
 
     if (errors.length > 0) {
-      throw new Error(`Configuration validation failed:\n${errors.join('\n• ')}`);
+      throw new Error(
+        `Configuration validation failed:\n${errors.join('\n• ')}`
+      );
     }
   }
   private validateCredentials(): void {
@@ -110,7 +122,7 @@ export class ConfigService {
     if (this.isProduction && isLocalhost) {
       throw new Error('Production database cannot use localhost');
     }
-    
+
     if (!this.appConfig.mikroORM.clientUrl.startsWith('mongodb')) {
       throw new Error('Invalid MongoDB connection scheme');
     }
@@ -123,7 +135,9 @@ export class ConfigService {
           throw new Error('TLS CA file not found');
         }
       } catch (e) {
-        throw new Error(`TLS CA file validation failed: ${e as Error}.message}`);
+        throw new Error(
+          `TLS CA file validation failed: ${e as Error}.message}`
+        );
       }
     }
   }
@@ -132,7 +146,6 @@ export class ConfigService {
   get fullConfig(): AppConfig {
     return JSON.parse(JSON.stringify(this.appConfig)); // 返回深拷贝
   }
-
 
   get mikroOrmConfig(): MikroORMConfig {
     return this.appConfig.mikroORM;
@@ -144,5 +157,34 @@ export class ConfigService {
 
   get isProduction(): boolean {
     return this.appConfig.nodeEnv === 'production';
+  }
+
+  public get<T = string>(key: string): T {
+    return config[key as keyof typeof config] as T;
+  }
+
+  public getArray<T = string>(key: string): T[] {
+    const value = this.get<T | string>(key);
+
+    if (Array.isArray(value)) {
+      return value as T[];
+    }
+
+    if (typeof value === 'string') {
+      return value.split(',').map((item) => item.trim()) as T[];
+    }
+
+    throw new Error(`Configuration key ${key} is not an array or a string`);
+  }
+
+  public getNumber(key: string): number {
+    const value = this.get(key);
+    const numericValue = Number(value);
+
+    if (Number.isNaN(numericValue)) {
+      throw new Error(`Configuration key ${key} is not a valid number`);
+    }
+
+    return numericValue;
   }
 }

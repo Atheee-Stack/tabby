@@ -3,11 +3,12 @@
   "compilerOptions": {
     "rootDir": ".",
     "strict": true,
-    "noImplicitAny": false ,
+    "noImplicitAny": false,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": true, // 强制 catch 变量为 unknown
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -25,6 +26,7 @@
       "@api-gateway/*": ["libs/*/src"],
       "@nestjs/platform-express": ["node_modules/@nestjs/platform-express"],
       "@nestjs/platform-socket.io": ["node_modules/@nestjs/platform-socket.io"],
+      "@taddy/core-lib": ["libs/core/src/index.ts"],
       "@taddy/shared-lib": ["libs/shared/src/index.ts"]
     }
   },

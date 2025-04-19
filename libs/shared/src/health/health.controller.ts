@@ -33,7 +33,6 @@ export class HealthController {
       };
     }
   }
-  //TODO 需要自定义错误类型
 
   private async checkDatabaseLatency(): Promise<number> {
     const start = Date.now();

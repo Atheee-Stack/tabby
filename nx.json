@@ -29,5 +29,24 @@
       },
       "exclude": ["apps/api-gateway-e2e/**/*"]
     }
-  ]
+  ],
+  "targetDefaults": {
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    }
+  },
+  "cacheableOperations": [
+    "build",
+    "test",
+    "lint",
+    "e2e",
+    "docker-build"
+  ],
+  "release": {
+    "version": {
+      "preVersionCommand": "bunx nx run-many -t build"
+    }
+  }
 }

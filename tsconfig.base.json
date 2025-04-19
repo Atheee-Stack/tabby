@@ -2,6 +2,12 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
+    "strict": true,
+    "noImplicitAny": false ,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -15,11 +21,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "types": ["bun-types", "node"],
-
     "paths": {
       "@api-gateway/*": ["libs/*/src"],
       "@nestjs/platform-express": ["node_modules/@nestjs/platform-express"],
-      "@nestjs/platform-socket.io": ["node_modules/@nestjs/platform-socket.io"]
+      "@nestjs/platform-socket.io": ["node_modules/@nestjs/platform-socket.io"],
+      "@taddy/shared-lib": ["libs/shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
